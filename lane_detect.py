@@ -87,7 +87,44 @@ while True:
         ksize=(5, 5)
     )
 
+    # TASK 7: detectarea marginilor cu filtre Sobel
 
+    # Filtrul Sobel pentru diferențe pe orizontală
+    sobel_vertical = np.array(
+        [
+            [-1, -2, -1],
+            [0, 0, 0],
+            [+1, +2, +1]
+        ],
+        dtype=np.float32
+    )
+
+    sobel_horizontal = np.transpose(sobel_vertical)
+
+    # Convertim imaginea la float32 pentru a putea avea și valori negative
+    blurred_float = np.float32(blurred_frame)
+
+    # Aplicăm separat cele două filtre pe aceeași imagine
+    horizontal_edges = cv2.filter2D(
+        blurred_float,
+        -1,
+        sobel_horizontal
+    )
+
+    vertical_edges = cv2.filter2D(
+        blurred_float,
+        -1,
+        sobel_vertical
+    )
+
+    # Combinăm cele două rezultate
+    sobel_combined = np.sqrt(
+        horizontal_edges ** 2 +
+        vertical_edges ** 2
+    )
+
+    # Convertim rezultatul înapoi la uint8 pentru afișare
+    sobel_frame = cv2.convertScaleAbs(sobel_combined)
 
     cv2.imshow("Original resized", frame)
     cv2.imshow("Grayscale manual", gray_frame)
@@ -95,7 +132,13 @@ while True:
     cv2.imshow("Road only", road_frame)
     cv2.imshow("Top down", top_down_frame)
     cv2.imshow("Blurred", blurred_frame)
-    
+
+    cv2.imshow("Sobel horizontal",cv2.convertScaleAbs(horizontal_edges))
+
+    cv2.imshow("Sobel vertical",cv2.convertScaleAbs(vertical_edges)
+    )
+
+    cv2.imshow("Sobel combined", sobel_frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
