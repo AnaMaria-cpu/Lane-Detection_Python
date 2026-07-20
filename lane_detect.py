@@ -1,7 +1,7 @@
 import cv2
 
 
-cam = cv2.VideoCapture(r"D:\Aumovio\sapt2_Python\Lane Detection Test Video 01.mp4")
+cam = cv2.VideoCapture("Lane Detection Test Video 01.mp4")
 
 while True:
 
