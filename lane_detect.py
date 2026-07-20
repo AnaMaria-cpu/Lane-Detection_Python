@@ -81,6 +81,12 @@ while True:
         perspective_matrix,
         (width, height)
     )
+    # TASK 6: aplicăm blur pe imaginea văzută de sus
+    blurred_frame = cv2.blur(
+        top_down_frame,
+        ksize=(5, 5)
+    )
+
 
 
     cv2.imshow("Original resized", frame)
@@ -88,7 +94,8 @@ while True:
     cv2.imshow("Trapezoid", trapezoid_frame * 255)
     cv2.imshow("Road only", road_frame)
     cv2.imshow("Top down", top_down_frame)
-
+    cv2.imshow("Blurred", blurred_frame)
+    
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
