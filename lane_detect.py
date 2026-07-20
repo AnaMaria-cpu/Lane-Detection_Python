@@ -5,6 +5,13 @@ cam = cv2.VideoCapture("Lane Detection Test Video 01.mp4")
 
 first_frame = True
 
+# Punctele liniilor din cadrul anterior
+left_top = (0, 0)
+left_bottom = (0, 0)
+
+right_top = (0, 0)
+right_bottom = (0, 0)
+
 while True:
     ret, frame = cam.read()
 
@@ -136,7 +143,114 @@ while True:
 
     binary_frame[binary_frame >= threshold] = 255
 
+    # TASK 9: găsim coordonatele marcajelor din stânga și dreapta
 
+    # Facem o copie ca să nu modificăm binary_frame
+    clean_binary_frame = binary_frame.copy()
+
+    side_margin = int(width * 0.05)
+
+    clean_binary_frame[:, :side_margin] = 0
+    clean_binary_frame[:, width - side_margin:] = 0
+
+    middle = width // 2
+
+    left_half = clean_binary_frame[:, :middle]
+    right_half = clean_binary_frame[:, middle:]
+
+    # np.argwhere returnează coordonatele în ordinea (row, column), adică (y, x)
+    left_points = np.argwhere(left_half == 255)
+    right_points = np.argwhere(right_half == 255)
+
+    # Separăm coordonatele pentru partea stângă
+    left_y = left_points[:, 0]
+    left_x = left_points[:, 1]
+
+    # Separăm coordonatele pentru partea dreaptă
+    right_y = right_points[:, 0]
+    right_x = right_points[:, 1] + middle
+
+    # TASK 10: găsim liniile care se potrivesc marcajelor
+
+    # Calculăm linia din partea stângă
+    if len(left_x) >= 2:
+
+        # polyfit returnează b și a pentru ecuația:
+        # y = a * x + b
+        left_b, left_a = np.polynomial.polynomial.polyfit(
+            left_x,
+            left_y,
+            deg=1
+        )
+
+        # Evităm împărțirea la zero
+        if abs(left_a) > 0.0001:
+
+            left_top_x = int((0 - left_b) / left_a)
+            left_bottom_x = int(((height - 1) - left_b) / left_a)
+
+            # Actualizăm punctele doar dacă valorile sunt valide
+            if (
+                    0 <= left_top_x < width
+                    and 0 <= left_bottom_x < width
+            ):
+                left_top = (left_top_x, 0)
+                left_bottom = (left_bottom_x, height - 1)
+
+    # Calculăm linia din partea dreaptă
+    if len(right_x) >= 2:
+
+        right_b, right_a = np.polynomial.polynomial.polyfit(
+            right_x,
+            right_y,
+            deg=1
+        )
+
+        if abs(right_a) > 0.0001:
+
+            right_top_x = int((0 - right_b) / right_a)
+            right_bottom_x = int(((height - 1) - right_b) / right_a)
+
+            if (
+                    0 <= right_top_x < width
+                    and 0 <= right_bottom_x < width
+            ):
+                right_top = (right_top_x, 0)
+                right_bottom = (right_bottom_x, height - 1)
+
+    # Transformăm imaginea binară în imagine cu 3 canale
+    # doar pentru a putea desena liniile în culori diferite
+    lane_lines_frame = cv2.cvtColor(
+        clean_binary_frame,
+        cv2.COLOR_GRAY2BGR
+    )
+
+    # Linia din stânga - albastră
+    cv2.line(
+        lane_lines_frame,
+        left_top,
+        left_bottom,
+        (255, 0, 0),
+        5
+    )
+
+    # Linia din dreapta - roșie
+    cv2.line(
+        lane_lines_frame,
+        right_top,
+        right_bottom,
+        (0, 0, 255),
+        5
+    )
+
+    # Linia care separă cele două jumătăți
+    cv2.line(
+        lane_lines_frame,
+        (middle, 0),
+        (middle, height - 1),
+        (255, 255, 0),
+        1
+    )
 
     cv2.imshow("Original resized", frame)
     cv2.imshow("Grayscale manual", gray_frame)
@@ -151,6 +265,7 @@ while True:
 
     cv2.imshow("Binarized", binary_frame)
 
+    cv2.imshow("Lane lines", lane_lines_frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
