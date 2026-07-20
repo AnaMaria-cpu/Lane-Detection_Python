@@ -126,6 +126,18 @@ while True:
     # Convertim rezultatul înapoi la uint8 pentru afișare
     sobel_frame = cv2.convertScaleAbs(sobel_combined)
 
+    # TASK 8: binarizarea imaginii
+
+    threshold = int(255 / 2)  # 127
+
+    binary_frame = sobel_frame.copy()
+
+    binary_frame[binary_frame < threshold] = 0
+
+    binary_frame[binary_frame >= threshold] = 255
+
+
+
     cv2.imshow("Original resized", frame)
     cv2.imshow("Grayscale manual", gray_frame)
     cv2.imshow("Trapezoid", trapezoid_frame * 255)
@@ -134,11 +146,11 @@ while True:
     cv2.imshow("Blurred", blurred_frame)
 
     cv2.imshow("Sobel horizontal",cv2.convertScaleAbs(horizontal_edges))
-
-    cv2.imshow("Sobel vertical",cv2.convertScaleAbs(vertical_edges)
-    )
-
+    cv2.imshow("Sobel vertical",cv2.convertScaleAbs(vertical_edges) )
     cv2.imshow("Sobel combined", sobel_frame)
+
+    cv2.imshow("Binarized", binary_frame)
+
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
