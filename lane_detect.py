@@ -252,6 +252,83 @@ while True:
         1
     )
 
+    # TASK 11: vizualizarea peste cadrul original
+    # Creăm o imagine neagră pentru linia stângă
+    left_line_frame = np.zeros(
+        (height, width),
+        dtype=np.uint8
+    )
+
+    cv2.line(
+        left_line_frame,
+        left_top,
+        left_bottom,
+        255,
+        3
+    )
+
+    # Transformarea inversă:
+    # din top-down înapoi în trapezul drumului
+    reverse_perspective_matrix = (
+        cv2.getPerspectiveTransform(
+            frame_points,
+            trapezoid_points_float
+        )
+    )
+
+    # Mutăm linia stângă în zona trapezului
+    left_line_trapezoid = cv2.warpPerspective(
+        left_line_frame,
+        reverse_perspective_matrix,
+        (width, height)
+    )
+
+    # Coordonatele pixelilor liniei stângi
+    left_line_coordinates = np.argwhere(
+        left_line_trapezoid > 0
+    )
+
+    # Creăm separat imaginea pentru linia dreaptă
+    right_line_frame = np.zeros(
+        (height, width),
+        dtype=np.uint8
+    )
+
+    cv2.line(
+        right_line_frame,
+        right_top,
+        right_bottom,
+        255,
+        3
+    )
+
+    # Mutăm linia dreaptă în zona trapezului
+    right_line_trapezoid = cv2.warpPerspective(
+        right_line_frame,
+        reverse_perspective_matrix,
+        (width, height)
+    )
+
+    # Coordonatele pixelilor liniei drepte
+    right_line_coordinates = np.argwhere(
+        right_line_trapezoid > 0
+    )
+
+    # Copiem cadrul original redimensionat
+    final_frame = frame.copy()
+
+    # Colorăm linia stângă în roșu
+    final_frame[
+        left_line_coordinates[:, 0],
+        left_line_coordinates[:, 1]
+    ] = (50, 50, 250)
+
+    # Colorăm linia dreaptă în verde
+    final_frame[
+        right_line_coordinates[:, 0],
+        right_line_coordinates[:, 1]
+    ] = (50, 250, 50)
+
     cv2.imshow("Original resized", frame)
     cv2.imshow("Grayscale manual", gray_frame)
     cv2.imshow("Trapezoid", trapezoid_frame * 255)
@@ -266,6 +343,9 @@ while True:
     cv2.imshow("Binarized", binary_frame)
 
     cv2.imshow("Lane lines", lane_lines_frame)
+
+    cv2.imshow("Final lane detection",final_frame)
+
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
