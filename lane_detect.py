@@ -55,10 +55,40 @@ while True:
 
     road_frame = gray_frame * trapezoid_frame
 
+    # TASK 5: transformăm drumul într-o vedere de sus
+
+    # Colțurile întregului frame, în aceeași ordine ca trapezul:
+    # upper right, upper left, lower left, lower right
+    frame_points = np.array(
+        [
+            (width - 1, 0),
+            (0, 0),
+            (0, height - 1),
+            (width - 1, height - 1)
+        ],
+        dtype=np.float32
+    )
+
+    trapezoid_points_float = np.float32(trapezoid_points)
+
+    perspective_matrix = cv2.getPerspectiveTransform(
+        trapezoid_points_float,
+        frame_points
+    )
+
+    top_down_frame = cv2.warpPerspective(
+        road_frame,
+        perspective_matrix,
+        (width, height)
+    )
+
+
     cv2.imshow("Original resized", frame)
     cv2.imshow("Grayscale manual", gray_frame)
     cv2.imshow("Trapezoid", trapezoid_frame * 255)
     cv2.imshow("Road only", road_frame)
+    cv2.imshow("Top down", top_down_frame)
+
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
