@@ -329,20 +329,20 @@ while True:
         right_line_coordinates[:, 1]
     ] = (50, 250, 50)
 
-    cv2.imshow("Original resized", frame)
-    cv2.imshow("Grayscale manual", gray_frame)
-    cv2.imshow("Trapezoid", trapezoid_frame * 255)
-    cv2.imshow("Road only", road_frame)
-    cv2.imshow("Top down", top_down_frame)
-    cv2.imshow("Blurred", blurred_frame)
-
-    cv2.imshow("Sobel horizontal",cv2.convertScaleAbs(horizontal_edges))
-    cv2.imshow("Sobel vertical",cv2.convertScaleAbs(vertical_edges) )
-    cv2.imshow("Sobel combined", sobel_frame)
-
-    cv2.imshow("Binarized", binary_frame)
-
-    cv2.imshow("Lane lines", lane_lines_frame)
+    # cv2.imshow("Original resized", frame)
+    # cv2.imshow("Grayscale manual", gray_frame)
+    # cv2.imshow("Trapezoid", trapezoid_frame * 255)
+    # cv2.imshow("Road only", road_frame)
+    # cv2.imshow("Top down", top_down_frame)
+    # cv2.imshow("Blurred", blurred_frame)
+    #
+    # cv2.imshow("Sobel horizontal",cv2.convertScaleAbs(horizontal_edges))
+    # cv2.imshow("Sobel vertical",cv2.convertScaleAbs(vertical_edges) )
+    # cv2.imshow("Sobel combined", sobel_frame)
+    #
+    # cv2.imshow("Binarized", binary_frame)
+    #
+    # cv2.imshow("Lane lines", lane_lines_frame)
 
     cv2.imshow("Final lane detection",final_frame)
 
